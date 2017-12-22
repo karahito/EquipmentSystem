@@ -1,0 +1,34 @@
+<!--
+  ~ Copyright (C) 2017 Japan Micro System
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  -->
+
+<resources>
+    <string name="app_name">備品管理Mobile</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="list">List</string>
+    <string name="qr">QR</string>
+    <string name="history">History</string>
+    <string name="eCode">固有番号</string>
+    <string name="eWorker">管理者</string>
+    <string name="workerName">管理者名</string>
+    <string name="operator">実行者</string>
+    <string name="transactionDate">棚卸日</string>
+    <string name="login_unless">ログインしてください。</string>
+    <string name="login_jpn">ログイン</string>
+    <string name="logout_jpn">ログアウト</string>
+    <string name="network">ネットワーク</string>
+    <string name="error">エラー</string>
+</resources>
