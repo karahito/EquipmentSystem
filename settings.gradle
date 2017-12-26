@@ -14,4 +14,3 @@
  */
 
 include ':app', ':android-commons'
-include ':ios'

@@ -41,7 +41,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="jms.barcode.BarcodeCaptureActivity"
+        <activity android:name="jms.android.camera.barcode.BarcodeCaptureActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar"/>
 
     </application>
