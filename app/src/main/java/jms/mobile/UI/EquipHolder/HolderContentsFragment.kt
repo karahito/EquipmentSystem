@@ -30,18 +30,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.CalendarView
 import android.widget.EditText
 import android.widget.Toast
 import butterknife.BindView
 import butterknife.ButterKnife
+import com.google.gson.Gson
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.exceptions.RealmPrimaryKeyConstraintException
 import jms.android.common.LogUtil
+import jms.android.mail.AndroidJavaMail
 import jms.mobile.Entity.DBTable.EquipmentHolder
+import jms.mobile.Entity.DBTable.TransactionHistory
+import jms.mobile.Entity.TransactionToJson
 import jms.mobile.Model.DbManagement
 import jms.mobile.Model.NetworkProtocol
 import jms.mobile.R
+import jms.mobile.Service.MailSend
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 /**
@@ -119,35 +127,91 @@ class HolderContentsFragment:Fragment(){
             dialog.show()
         }
 
-        mTransaction.setOnClickListener {
-            val wCode = client.wCode
-            if (wCode != null) {
-                progress.setCancelable(false)
-                progress.show()
-                val result = DbManagement.read<EquipmentHolder>()
-                val eCode = mutableListOf<String>()
-                result.forEach {
-                    eCode.add(it.eCode)
-                }
-                client.transaction(wCode,eCode.toTypedArray())
-                        .subscribeOn(Schedulers.computation())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                {
-                                    Toast.makeText(context,it.first,Toast.LENGTH_SHORT).show()
-                                    DbManagement.insertOrUpdate(it.second)
-                                    DbManagement.delete<EquipmentHolder>(result)
-                                    progress.dismiss()
-                                },
-                                {
-                                    LogUtil.e(it)
-                                    progress.dismiss()
-                                }
-                        )
-
-            }
-        }
+        mTransaction.setOnClickListener(transactionListener)
 
         return view
     }
+
+    private val transactionListener = View.OnClickListener {
+        val wCode = client.wCode
+        val eCode = mutableListOf<String>()
+        if (wCode != null) {
+            val result = DbManagement.read<EquipmentHolder>()
+            result.forEach {
+                eCode.add(it.eCode)
+            }
+            DbManagement.delete<EquipmentHolder>(result)
+        }else
+            return@OnClickListener
+
+        val netState = this.arguments?.getBoolean(getString(R.string.NetState_key)) ?: false
+        if(netState) {
+            doOnline(wCode,eCode.toTypedArray())
+        }else
+            doOffline(wCode,eCode.toTypedArray())
+
+
+    }
+
+    private fun doOnline(wCode:String,eCode:Array<String>) {
+        client.transaction(wCode, eCode)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    progress.setCancelable(false)
+                    progress.show()
+                }
+                .subscribe(
+                        {
+                            Toast.makeText(context, it.first, Toast.LENGTH_SHORT).show()
+                            DbManagement.insertOrUpdate(it.second)
+                            progress.dismiss()
+                        },
+                        {
+                            LogUtil.e(it)
+                            progress.dismiss()
+                        }
+                )
+
+    }
+
+    private fun doOffline(wCode:String,eCode:Array<String>){
+        val json = Gson().toJson(TransactionToJson(wCode,eCode))
+        val mailer = AndroidJavaMail.Builder(context!!)
+                .subject(getString(R.string.subject))
+                .server(getString(R.string.server))
+                .port(getString(R.string.port))
+                .address(getString(R.string.address))
+                .userId(getString(R.string.address))
+                .password(getString(R.string.password))
+                .protocol(getString(R.string.protocol))
+                .sercure(true)
+                .message(json)
+                .build()
+        MailSend().build(mailer)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    progress.setCancelable(false)
+                    progress.show()
+                }
+                .subscribe(
+                        {
+                            var lastIdx = DbManagement.read<TransactionHistory>().lastIndex
+                            val histroy = mutableListOf<TransactionHistory>()
+                            val date = Calendar.getInstance().time
+                            eCode.forEach {
+                                histroy.add(TransactionHistory(lastIdx,it,wCode,date))
+                                lastIdx += 1
+                            }
+                            DbManagement.insertOrUpdate(histroy)
+                            Toast.makeText(context,"success",Toast.LENGTH_SHORT).show()
+                        },
+                        {
+                            Toast.makeText(context,it.message,Toast.LENGTH_SHORT).show()
+                        }
+                )
+
+    }
+
 }

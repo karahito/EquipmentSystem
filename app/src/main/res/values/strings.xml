@@ -32,4 +32,12 @@
     <string name="network">ネットワーク</string>
     <string name="error">エラー</string>
     <string name="result">結果</string>
+    <string name="NetState_key">NetStatus</string>
+
+    <string name="subject">棚卸登録</string>
+    <string name="server">smtp.jpms.co.jp</string>
+    <string name="port">587</string>
+    <string name="address">stocktaking-test@jpms.co.jp</string>
+    <string name="password">test0857</string>
+    <string name="protocol">smtp</string>
 </resources>

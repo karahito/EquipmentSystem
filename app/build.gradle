@@ -44,7 +44,6 @@ repositories{
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    compile(name: 'libraries-release', ext: 'aar')
     //noinspection GradleCompatible
     provided 'com.android.support:appcompat-v7:27.0.2'
     provided 'com.android.support:support-v4:27.0.2'
@@ -54,13 +53,14 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    implementation 'com.google.android.gms:play-services-vision:11.6.2'
     /**
      *  Database Support Libraries
      */
     //===========================================================================================================
     /** Realm View Adapter  */
     ext.realm_adapter_version = '2.1.1'
-    compile "io.realm:android-adapters:$realm_adapter_version"
+    implementation "io.realm:android-adapters:$realm_adapter_version"
     //===========================================================================================================
     /**
      *  DataBinding Libraries
@@ -68,12 +68,12 @@ dependencies {
     //===========================================================================================================
     /** ButterKnife  */
     ext.butterknife_version = '8.8.1'
-    compile "com.jakewharton:butterknife:$butterknife_version"
+    implementation "com.jakewharton:butterknife:$butterknife_version"
     kapt "com.jakewharton:butterknife-compiler:$butterknife_version"
     //===========================================================================================================
     /** Jspoon Converter  */
     ext.jspoon_version = '1.0.1'
-    compile "pl.droidsonroids.retrofit2:converter-jspoon:$jspoon_version"
+    implementation "pl.droidsonroids.retrofit2:converter-jspoon:$jspoon_version"
     implementation project(':android-commons')
 }
 

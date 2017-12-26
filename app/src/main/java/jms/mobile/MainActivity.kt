@@ -206,6 +206,11 @@ class MainActivity : RxAppCompatActivity(){
                 netStatus = boolean
             }else
                 setNetworkStatus(boolean)
+
+            val args = Bundle()
+            args.putBoolean(getString(R.string.NetState_key),netStatus)
+            holder.arguments = args
+
         }
 
         manager = supportFragmentManager
@@ -213,26 +218,6 @@ class MainActivity : RxAppCompatActivity(){
                 .add(R.id.contents, holder)
                 .commit()
     }
-
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//
-//        if (data != null) {
-//            val result = IntentIntegrator.parseActivityResult(requestCode,resultCode,data)
-//            val eCode = result.contents.lines()
-//            if (result.contents.lines().count() == 3 && eCode[0].length == 5) {
-//                val realm = Realm.getDefaultInstance()
-//                realm.run {
-//                    beginTransaction()
-//                    insertOrUpdate(EquipmentHolder(eCode[0],eCode[1],eCode[2]))
-//                    commitTransaction()
-//                }
-//                realm.close()
-//            }else{
-//                Toast.makeText(this,"Illegal Reading",Toast.LENGTH_SHORT).show()
-//            }
-//        }
-//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == BARCODE_CAPTURE_REQUEST) {
@@ -326,6 +311,9 @@ class MainActivity : RxAppCompatActivity(){
                 netStatus = false
             }
         }
+        val args = Bundle()
+        args.putBoolean(getString(R.string.NetState_key),netStatus)
+        holder.arguments = args
     }
 
     private fun onBarcodeScanClick() {
@@ -344,7 +332,6 @@ class MainActivity : RxAppCompatActivity(){
         @JvmStatic lateinit var manager:FragmentManager
         @JvmStatic val holder = HolderContentsFragment.newInstance()
         @JvmStatic val history = HistoryContentsFragment.newInstnce()
-//        @JvmStatic val client = NetworkApi.newInstance()
         @JvmStatic val client = NetworkProtocol
         enum class MenuItem(val position:Int){
             SIGN_IN(0),
