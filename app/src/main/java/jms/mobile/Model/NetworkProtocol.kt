@@ -86,10 +86,10 @@ object NetworkProtocol {
                 .subscribe(
                         {
                             LogUtil.d(it.json)
-                            if (it.json == null) {
+                            if (it.json.isNullOrBlank()) {
                                 return@subscribe emitter.onSuccess(Pair("Transaction Success", generateTransactionHistoryOnSuccess(wCode,eCode)))
                             }
-                            val error:TransactionResponse = parseJson(it.json)
+                            val error:TransactionResponse = parseJson(it.json!!)
                             return@subscribe emitter.onSuccess(Pair("Failed", generateTransactionHistoryOnFailed(wCode,eCode,error)))
                         },
                         {

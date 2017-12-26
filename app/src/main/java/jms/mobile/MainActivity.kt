@@ -35,17 +35,14 @@ import android.widget.TextView
 import android.widget.Toast
 import butterknife.BindView
 import butterknife.ButterKnife
-import com.google.zxing.integration.android.IntentIntegrator
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle2.kotlin.bindToLifecycle
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
-import io.realm.Realm
 import jms.android.common.LogUtil
 import jms.android.common.utility.RxNetworkState
-import jms.mobile.Entity.DBTable.EquipmentHolder
 import jms.mobile.Model.DbManagement
 import jms.mobile.Model.EventStream
 import jms.mobile.Model.NetworkProtocol
@@ -70,7 +67,7 @@ class MainActivity : RxAppCompatActivity(){
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_camera -> {
-                IntentIntegrator(this).initiateScan()
+                onBarcodeScanClick()
                 return@OnNavigationItemSelectedListener false
             }
             R.id.navigation_history -> {
@@ -212,25 +209,53 @@ class MainActivity : RxAppCompatActivity(){
                 .commit()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//
+//        if (data != null) {
+//            val result = IntentIntegrator.parseActivityResult(requestCode,resultCode,data)
+//            val eCode = result.contents.lines()
+//            if (result.contents.lines().count() == 3 && eCode[0].length == 5) {
+//                val realm = Realm.getDefaultInstance()
+//                realm.run {
+//                    beginTransaction()
+//                    insertOrUpdate(EquipmentHolder(eCode[0],eCode[1],eCode[2]))
+//                    commitTransaction()
+//                }
+//                realm.close()
+//            }else{
+//                Toast.makeText(this,"Illegal Reading",Toast.LENGTH_SHORT).show()
+//            }
+//        }
+//    }
 
-        if (data != null) {
-            val result = IntentIntegrator.parseActivityResult(requestCode,resultCode,data)
-            val eCode = result.contents.lines()
-            if (result.contents.lines().count() == 3 && eCode[0].length == 5) {
-                val realm = Realm.getDefaultInstance()
-                realm.run {
-                    beginTransaction()
-                    insertOrUpdate(EquipmentHolder(eCode[0],eCode[1],eCode[2]))
-                    commitTransaction()
-                }
-                realm.close()
-            }else{
-                Toast.makeText(this,"Illegal Reading",Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        if (requestCode == BARCODE_CAPTURE_REQUEST) {
+//            if (resultCode == CommonStatusCodes.SUCCESS) {
+//                if (data != null) {
+//                    val barcode = data.getParcelableExtra<Barcode>(BarcodeCaptureActivity.BarcodeObject)
+//                    val result = barcode.displayValue
+//                    val eCode = result.lines()
+//                    if (result.lines().count() == 3 && eCode[0].length == 5) {
+//                        val realm = Realm.getDefaultInstance()
+//                        realm.run {
+//                            beginTransaction()
+//                            insertOrUpdate(EquipmentHolder(eCode[0], eCode[1], eCode[2]))
+//                            commitTransaction()
+//                        }
+//                        realm.close()
+//                        Toast.makeText(this, barcode.displayValue, Toast.LENGTH_SHORT).show()
+//                    } else {
+//                        Toast.makeText(this, "バーコードがキャプチャ出来ませんでした", Toast.LENGTH_SHORT).show()
+//                    }
+//                } else {
+//                    Toast.makeText(this, "バーコードの読み込みに失敗しました", Toast.LENGTH_SHORT).show()
+//                }
+//            } else {
+//                super.onActivityResult(requestCode, resultCode, data)
+//            }
+//        }
+//    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -298,6 +323,14 @@ class MainActivity : RxAppCompatActivity(){
         }
     }
 
+    private fun onBarcodeScanClick() {
+        val intent = Intent(this, BarcodeCaptureActivity::class.java)
+        intent.putExtra(BarcodeCaptureActivity.AutoFocus, true)
+        intent.putExtra(BarcodeCaptureActivity.UseFlash, false)
+
+        startActivityForResult(intent, BARCODE_CAPTURE_REQUEST)
+    }
+
 
     /**
      * SingletonObject を定義
@@ -317,5 +350,6 @@ class MainActivity : RxAppCompatActivity(){
         private val ACCEPT_SSID = """"JMS-SOFT""""
         @JvmStatic val network = RxNetworkState.newInstance()
         @JvmStatic val disposable = CompositeDisposable()
+        private val BARCODE_CAPTURE_REQUEST = 0x0001
     }
 }

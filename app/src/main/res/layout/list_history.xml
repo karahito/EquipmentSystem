@@ -88,7 +88,7 @@
             android:background="@color/windowBackground"
             android:ems="6"
             android:gravity="center"
-            android:text="@string/network"
+            android:text="@string/result"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/title_history_error"
             app:layout_constraintStart_toEndOf="@+id/title_history_worker"
